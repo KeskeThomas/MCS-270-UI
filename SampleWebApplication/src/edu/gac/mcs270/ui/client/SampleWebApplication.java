@@ -16,6 +16,7 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.StackPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -23,6 +24,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class SampleWebApplication implements EntryPoint {
+	
 	/**
 	 * The message displayed to the user when the server cannot be reached or
 	 * returns an error.
@@ -40,9 +42,11 @@ public class SampleWebApplication implements EntryPoint {
 	/**
 	 * This is the entry point method.
 	 */
+	private boolean check = true;
 	public void onModuleLoad() {
 		final Label instructionsLabel = new Label("Please enter your name:");
 		final Button sendButton = new Button("Send");
+		final Button changeButton = new Button("Change Color");
 		final TextBox nameField = new TextBox();
 		nameField.setText("GWT User");
 		final Label errorLabel = new Label();
@@ -50,8 +54,10 @@ public class SampleWebApplication implements EntryPoint {
 
 		// We can add style names to widgets
 		sendButton.addStyleName("sendButton");
+		changeButton.addStyleName("sendButton");
 		errorLabel.addStyleName("error");
 		instructionsLabel.addStyleName("instructions");
+	
 		
 		// Create some panels to hold the widgets together
 		final VerticalPanel mainPanel = new VerticalPanel();
@@ -59,13 +65,17 @@ public class SampleWebApplication implements EntryPoint {
 		final VerticalPanel outerPanel = new VerticalPanel();
 		outerPanel.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
 		
+	
+		
 		// Assemble the widgets into the panels
 		entryPanel.add(nameField);
 		entryPanel.add(sendButton);
+		entryPanel.add(changeButton);
 		mainPanel.add(instructionsLabel);
 		mainPanel.add(entryPanel);
 		mainPanel.add(errorLabel);
 		outerPanel.add(mainPanel);
+		
 
 		// Add the outerPanel to the RootPanel
 		// Use RootPanel.get() to get the entire body element
@@ -77,7 +87,7 @@ public class SampleWebApplication implements EntryPoint {
 		
 		// Instead of displaying each greeting in a dialog box,
 		// accumulate them into a scrolling display.
-		final VerticalPanel greetingsPanel = new VerticalPanel();
+		final StackPanel greetingsPanel = new StackPanel();
 		final ScrollPanel greetingsScrollPanel = new ScrollPanel();
 		greetingsScrollPanel.setSize("50em", "30em");
 		greetingsScrollPanel.add(greetingsPanel);
@@ -87,6 +97,8 @@ public class SampleWebApplication implements EntryPoint {
 		spacer.setHeight("1em");
 		outerPanel.add(spacer);
 		outerPanel.add(greetingsCaptionPanel);
+		greetingsCaptionPanel.addStyleName("gCaptionPanel");
+		
 
 		// Create a handler for the sendButton and nameField
 		class MyHandler implements ClickHandler, KeyUpHandler {
@@ -107,6 +119,8 @@ public class SampleWebApplication implements EntryPoint {
 					sendNameToServer();
 				}
 			}
+			
+			
 
 			/**
 			 * Send the name from the nameField to the server and wait for a response.
@@ -122,17 +136,11 @@ public class SampleWebApplication implements EntryPoint {
 
 				// Then, we send the input to the server.
 				sendButton.setEnabled(false);
-				if(firstTime)
-					firstTime = false;
-				else
-					// separate usages with a horizontal rule
-					greetingsPanel.add(new HTML("<hr/>"));
 				final Label textToServerLabel = new Label(textToServer);
 				final HTML serverResponseLabel = new HTML();
-				greetingsPanel.add(new HTML("<b>Sending name to the server:</b>"));
-				greetingsPanel.add(textToServerLabel);
-				greetingsPanel.add(new HTML("<br><b>Server replies:</b>"));
-				greetingsPanel.add(serverResponseLabel);
+				greetingsPanel.insert(serverResponseLabel, 0);
+				greetingsPanel.setStackText(0, textToServer);
+				greetingsPanel.showStack(0);
 				greetingService.greetServer(textToServer,
 						new AsyncCallback<String>() {
 							public void onFailure(Throwable caught) {
@@ -148,17 +156,49 @@ public class SampleWebApplication implements EntryPoint {
 							
 							private void display(String message){
 								serverResponseLabel.setHTML(message);
-								greetingsScrollPanel.scrollToBottom();
+								greetingsScrollPanel.scrollToTop();
 								sendButton.setEnabled(true);
 								sendButton.setFocus(true);
 							}
 						});
 			}
 		}
+		class ChangeHandler implements ClickHandler {
+			
+			 
+			/**
+			 * Fired when the user clicks on the sendButton.
+			 */
+			public void onClick(ClickEvent event) {
+//				if (greetingsCaptionPanel.getStyleName() != "gPanel2"){
+//					changeColorWhite();
+//				}
+//				else if (greetingsCaptionPanel.getStyleName() == "gPanel2"){
+//					changeColorPurple();
+//				}
+				if (check == true) {changeColorWhite();   check = false;}
+				if (check == false) {changeColorPurple(); check = true;}
+			}
+			
+			public void changeColorWhite(){
+				greetingsCaptionPanel.addStyleName("gPanel2");
+			}
+			
+			public void changeColorPurple(){
+				greetingsCaptionPanel.addStyleName("gCaptionPanel");
+			}
+
+			/**
+			 * Send the name from the nameField to the server and wait for a response.
+			 */
+		}
 
 		// Add a handler to send the name to the server
 		MyHandler handler = new MyHandler();
 		sendButton.addClickHandler(handler);
 		nameField.addKeyUpHandler(handler);
+		
+		ChangeHandler newHandle = new ChangeHandler();
+		changeButton.addClickHandler(newHandle);
 	}
 }

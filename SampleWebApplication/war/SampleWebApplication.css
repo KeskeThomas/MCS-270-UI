@@ -8,12 +8,29 @@ h1 {
   color: #777777;
   margin: 40px 0px 70px;
   text-align: center;
+  background-color:#CCCCFF;	
+}
+html {
+background-color:#CCCCFF;	
+}
+.body {
+background-color:#CCCCFF;	
 }
 
 .sendButton {
   display: block;
   font-size: 16pt;
 }
+
+.gCaptionPanel
+{
+	background-color:#9999CC;
+}
+
+.gPanel2{
+	background-color:white;
+}
+
 
 /** Most GWT widgets already have a style name defined */
 .gwt-DialogBox {
@@ -23,6 +40,7 @@ h1 {
 .dialogVPanel {
   margin: 5px;
 }
+
 
 .error {
   color: red;
